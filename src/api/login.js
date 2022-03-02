@@ -2,7 +2,7 @@ import request from "../utils/request";
 
 export const login = (data) => {
     return request({
-        url: 'auth/login',
+        url: 'sys/login',
         method: 'post',
         data: data
     })
@@ -15,10 +15,14 @@ export const getInfo = () => {
     })
 }
 
-export const getCodeImg = () => {
+export const getCodeImg = (uuid) => {
     return request({
-        url: 'auth/code',
-        method: 'get'
+        url: 'captcha.jpg',
+        method: 'get',
+        responseType:"arraybuffer",
+        params:{
+            uuid
+        }
     })
 }
 

@@ -11,7 +11,7 @@ import axios from "axios";
 // })
 
 const service = axios.create({
-    // baseURL: 'http://localhost:10030', // api的base_url
+    baseURL: 'http://localhost:8080/renren-fast', // api的base_url
     timeout: 600000 // request timeout
 })
 

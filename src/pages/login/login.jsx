@@ -1,29 +1,28 @@
 import { Button, Form, Input, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { getCodeImg, login } from "../../api/login";
-import { encrypt } from '../../utils/rsaEncrypt';
+import { getUUID } from '../../utils/index';
 import './login.less';
 function Login(props) {
     const [codeImg, setCodeImg] = useState();
-    const [uuid,setUuid]= useState();
+    const [uuid, setUuid] = useState();
     //初始化
     useEffect(() => {
         getCode()
     }, []);
     // 登录
     const onFinish = (from) => {
-        from.uuid = uuid 
-        from.password = encrypt(from.password)
-        console.log('from', from)
+        from.uuid = uuid
+        // from.password = encrypt(from.password)
         login(from).then(res => {
             console.log(res)
-            if(res.status===200){
+            if (res.data.code === 0) {
                 const token = res.data.token
-                const auth = res.data.user
-                localStorage.setItem('auth', JSON.stringify(auth)  )
-                localStorage.setItem('token', token )
+                localStorage.setItem('token', token)
                 message.success('登录成功！')
                 props.history.push('/');
+            }else{
+                message.warning(res.data.msg)
             }
         })
 
@@ -34,9 +33,11 @@ function Login(props) {
     };
     //获取验证码
     const getCode = () => {
-        getCodeImg().then(res => {
-            let codeImg = res.data.img
-            let uuid = res.data.uuid
+        let uuid = getUUID()
+        getCodeImg(uuid).then(res => {
+            const codeImg = "data:image/png;base64," + btoa(new Uint8Array(res.data).reduce((data,byte)=>
+                data + String.fromCharCode(byte),""
+            ))
             setCodeImg(codeImg)
             setUuid(uuid)
         })
@@ -84,9 +85,9 @@ function Login(props) {
                     </Form.Item>
                     <div className="code">
                         <Form.Item
-                            style={{ margin: 0}}
+                            style={{ margin: 0 }}
                             label="验证码"
-                            name="code"
+                            name="captcha"
                             rules={[
                                 {
                                     required: true,

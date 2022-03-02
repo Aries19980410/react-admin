@@ -11,9 +11,6 @@ import User from "../user/user";
 const { Footer, Sider, Content } = Layout;
 
 class Admin extends Component {
-    // if (!user) {
-    //    return <Redirect to="/login" /> 
-    // }
     render() {
         return (
             <Layout style={{ height: '100%' }}>
