@@ -1,74 +1,80 @@
-import { DeleteOutlined, EditOutlined, TagsOutlined } from '@ant-design/icons';
-import { Button, Card, DatePicker, Form, Input, Modal, Popconfirm, Select, Space, Switch, Table, Tree } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Card, DatePicker, Form, Input, message, Modal, Popconfirm, Select, Space, Switch, Table, Tree } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { getJobsList, getRoleList, getUserDept, getUserPage } from '../../api/system';
+import { getUserPage } from '../../api/auth';
 import './user.less';
+
 
 const { TreeNode } = Tree
 const { RangePicker } = DatePicker
 const { Option } = Select;
 function User(props) {
     const [listData, setList] = useState()
-    const [deptList, setDept] = useState()
-    const [roleList, setRole] = useState()
-    const [jobList, setJob] = useState()
+    // const [deptList, setDept] = useState()
+    // const [roleList, setRole] = useState()
+    // const [jobList, setJob] = useState()
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState([])
     const [form] = Form.useForm()
-   
+
     useEffect(() => {
         getListData()       // 获取表格数据
-        getDeptList()       // 获取部门数据
-        getRole()           // 获取角色列表
-        getJobList()        // 获取岗位列表
+        // getDeptList()       // 获取部门数据
+        // getRole()           // 获取角色列表
+        // getJobList()        // 获取岗位列表
     }, []);
 
     // 表单重制
     const onReset = () => {
         form.resetFields();
     };
-    
+
     // 自定义树形
-    const getTreeNode = (deptList) => {
-        if (deptList && deptList.length > 0) {
-            return deptList.map(item => {
-                if (item.children) {
-                    return (
-                        <TreeNode key={item.id} title={item.name}>
-                            {getTreeNode(item.children)}
-                        </TreeNode>
-                    )
+    // const getTreeNode = (deptList) => {
+    //     if (deptList && deptList.length > 0) {
+    //         return deptList.map(item => {
+    //             if (item.children) {
+    //                 return (
+    //                     <TreeNode key={item.id} title={item.name}>
+    //                         {getTreeNode(item.children)}
+    //                     </TreeNode>
+    //                 )
 
-                }
-                return (
-                    <TreeNode key={item.id} title={item.name}></TreeNode>
-                )
-            })
-        }
-        return []
-    }
+    //             }
+    //             return (
+    //                 <TreeNode key={item.id} title={item.name}></TreeNode>
+    //             )
+    //         })
+    //     }
+    //     return []
+    // }
 
-    const selectDept = (selectedKeys, e) => {
-        console.log(selectedKeys, e)
-    }
+    // const selectDept = (selectedKeys, e) => {
+    //     console.log(selectedKeys, e)
+    // }
 
     //获取部门数据
-    const getDeptList = () => {
-        getUserDept().then(res => {
-            const deptList = res.data.content
-            setDept(deptList)
-        })
-    }
+    // const getDeptList = () => {
+    //     getUserDept().then(res => {
+    //         const deptList = res.data.content
+    //         setDept(deptList)
+    //     })
+    // }
 
     //获取表格数据
     const getListData = () => {
         let params = {
-            page: 0,
-            size: 10
+            page: 1,
+            limit: 10
         }
         getUserPage(params).then(res => {
-            const listData = res.data.content
-            setList(listData)
+            console.log(res)
+            if (res.data.code === 0) {
+                const listData = res.data.page.list
+                setList(listData)
+            } else {
+                message.warning(res.data.msg)
+            }
         })
     }
     const columns = [
@@ -79,20 +85,8 @@ function User(props) {
             align: "center",
         },
         {
-            title: '昵称',
-            dataIndex: 'nickName',
-            width: 'auto',
-            align: "center",
-        },
-        {
-            title: '性别',
-            dataIndex: 'gender',
-            width: 'auto',
-            align: "center",
-        },
-        {
             title: '电话',
-            dataIndex: 'phone',
+            dataIndex: 'mobile',
             width: 'auto',
             align: "center",
         },
@@ -107,13 +101,13 @@ function User(props) {
             dataIndex: 'dept',
             width: 'auto',
             align: "center",
-            render: (text, record, index) => {
-                return <span>{record.dept.name}</span>
-            }
+            // render: (text, record, index) => {
+            //     return <span>{record.dept.name}</span>
+            // }
         },
         {
             title: '状态',
-            dataIndex: 'enabled',
+            dataIndex: 'status',
             width: 'auto',
             align: "center",
             render: (text, record, rowIndex) => {
@@ -150,12 +144,12 @@ function User(props) {
     const handleEdit = (val) => {
         setIsModalVisible(true)
         form.setFieldsValue({
-            username:val.username,
-            phone:val.phone,
-            nickName:val.nickName,
-            email:val.email,
-            role:val.roles[0].id,
-            job:val.jobs[0].id
+            username: val.username,
+            phone: val.phone,
+            nickName: val.nickName,
+            email: val.email,
+            role: val.roles[0].id,
+            job: val.jobs[0].id
         })
     }
 
@@ -172,10 +166,10 @@ function User(props) {
     }
 
     // 取消删除
-    const cancelRemove = (e) => {}
+    const cancelRemove = (e) => { }
 
-    // 取消弹窗
-    const cancel= (e) => {
+    // // 取消弹窗
+    const cancel = (e) => {
         setIsModalVisible(false)
     }
 
@@ -189,65 +183,79 @@ function User(props) {
     }
     const hasSelected = selectedRowKeys.length > 0;
 
-    // 选择部门
-    const handleChangeRole = (values) => {
-        // console.log(values)
-    }
+    // // 选择部门
+    // const handleChangeRole = (values) => {
+    //     // console.log(values)
+    // }
 
-    // 获取role列表
-    const getRole = () => {
-        getRoleList().then(res => {
-            const roleList = res.data
-            setRole(roleList)
-        })
-    }
+    // // 获取role列表
+    // const getRole = () => {
+    //     getRoleList().then(res => {
+    //         const roleList = res.data
+    //         setRole(roleList)
+    //     })
+    // }
 
-    // 循环角色列表
-    const roleSelect = (roleList) => {
-        if (roleList && roleList.length) {
-            return roleList.map(item => {
-                return (
-                    <Option key={item.id} value={item.id}>{item.name}</Option>
-                )
-            })
+    // // 循环角色列表
+    // const roleSelect = (roleList) => {
+    //     if (roleList && roleList.length) {
+    //         return roleList.map(item => {
+    //             return (
+    //                 <Option key={item.id} value={item.id}>{item.name}</Option>
+    //             )
+    //         })
+    //     }
+    //     return []
+    // }
+
+    // // 获取岗位列表
+    // const getJobList = () => {
+    //     getJobsList().then(res => {
+    //         const jobList = res.data.content
+    //         setJob(jobList)
+    //     })
+    // }
+
+    // // 循环岗位
+    // const getJob = (jobList) => {
+    //     if (jobList && jobList.length) {
+    //         return jobList.map(item => {
+    //             return (
+    //                 <Option key={item.id} value={item.id}>{item.name}</Option>
+    //             )
+    //         })
+    //     }
+    //     return []
+    // }
+
+    // // 选择岗位
+    // const handleChangeJob = (values) => {
+    //     // console.log(values)
+    // }
+
+    const changeState=(val)=>{
+        console.log(val)
+        if(val===false){
+            form.state = 0
+        }else{
+            form.state = 1
         }
-        return []
-    }
-
-    // 获取岗位列表
-    const getJobList = () => {
-        getJobsList().then(res => {
-            const jobList = res.data.content
-            setJob(jobList)
-        })
-    }
-
-    // 循环岗位
-    const getJob = (jobList) => {
-        if (jobList && jobList.length) {
-            return jobList.map(item => {
-                return (
-                    <Option key={item.id} value={item.id}>{item.name}</Option>
-                )
-            })
-        }
-        return []
-    }
-
-    // 选择岗位
-    const handleChangeJob = (values) => {
-        // console.log(values)
+        console.log(form)
     }
 
     // 保存
     const save = (values) => {
+        let status = values.status =form.state
         console.log('Success:', values);
-        setIsModalVisible(false)
-        
+        // add(values).then(res=>{
+        //     console.log(res)
+        // })
+        // setIsModalVisible(false)
+
     };
 
     // 批量删除
-    const handleRemove=()=>{
+    const handleRemove = () => {
         console.log(selectedRowKeys)
     };
 
@@ -264,7 +272,7 @@ function User(props) {
                     form={form}
                 >
                     <Form.Item
-                        label="名称"
+                        label="用户名"
                         name="username"
                         rules={[
                             {
@@ -276,8 +284,20 @@ function User(props) {
                         <Input />
                     </Form.Item>
                     <Form.Item
+                        label="用户名"
+                        name="password"
+                        rules={[
+                            {
+                                required: true,
+                                message: '请输入密码',
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
                         label="手机号"
-                        name="phone"
+                        name="mobile"
                         rules={[
                             {
                                 required: true,
@@ -287,13 +307,14 @@ function User(props) {
                     >
                         <Input />
                     </Form.Item>
-                    <Form.Item label="昵称" name="nickName" rules={[{ required: true, message: '请输入昵称', },]}>
+
+                    <Form.Item label="邮箱" name="email" >
                         <Input />
                     </Form.Item>
-                    <Form.Item label="邮箱" name="email" rules={[{ required: true, message: '请输入邮箱', },]}>
-                        <Input />
+                    <Form.Item label="状态" name="status" valuePropName='checked'>
+                        <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked onChange={changeState}/>
                     </Form.Item>
-                    <Form.Item label="角色" name="role">
+                    {/* <Form.Item label="角色" name="role">
                         <Select style={{ width: 120 }} allowClear placeholder="请选择角色" onChange={handleChangeRole}>
                             {roleSelect(roleList)}
                         </Select>
@@ -302,19 +323,19 @@ function User(props) {
                         <Select style={{ width: 120 }} allowClear placeholder="请选择岗位"  onChange={handleChangeJob}>
                             {getJob(jobList)}
                         </Select>
-                    </Form.Item>
+                    </Form.Item> */}
                     <Form.Item>
-                        <Button type="primary"  htmlType="submit"> 确定 </Button>
+                        <Button type="primary" htmlType="submit"> 确定 </Button>
                     </Form.Item>
                 </Form>
             </Modal>
             <Card>
                 <div className="content-body">
-                    <div className="left">
+                    {/* <div className="left">
                         <Tree showLine blockNode onSelect={selectDept} switcherIcon={<TagsOutlined />}	>
                             {getTreeNode(deptList)}
                         </Tree>
-                    </div>
+                    </div> */}
                     <div className="right">
                         <div className="batchOperation">
                             <div className="searchParams">
@@ -322,7 +343,7 @@ function User(props) {
                                 <RangePicker bordered={false} placeholder={['开始日期', '结束日期']} />
                             </div>
                             <div className="table-left">
-                                <Button type="danger" disabled={!hasSelected} onClick={()=>handleRemove()}>删除</Button>
+                                <Button type="danger" disabled={!hasSelected} onClick={() => handleRemove()}>删除</Button>
                                 <Button type="primary" onClick={() => handelAdd()}>新增</Button>
                             </div>
                         </div>

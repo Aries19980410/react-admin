@@ -1,18 +1,8 @@
 import axios from "axios";
-// //设置请求得基准地址
-// axios.defaults.baseURL = 'http://xxxx.com/api'
-// const $request = axios.create();
-// //设置请求头
-// $request.interceptors.request.use(config => {
-//     // 给请求头加上Authorization,authJWT的字段,值为token
-//     config.headers.Authorization = window.sessionStorage.getItem('token')
-//     config.headers.authJWT = window.sessionStorage.getItem('token')
-//     return config
-// })
 
 const service = axios.create({
-    baseURL: 'http://localhost:8080/renren-fast', // api的base_url
-    timeout: 600000 // request timeout
+    baseURL: 'http://localhost:8080/renren-fast', 
+    timeout: 600000 
 })
 
 
@@ -20,22 +10,26 @@ const service = axios.create({
 axios.defaults.validateStatus = function (status) {
     return status >= 200 && status <= 500;
 };
-// //跨域请求，允许保存cookie
+
+//跨域请求，允许保存cookie
 axios.defaults.withCredentials = true;
 
 
 //设置请求头
 service.interceptors.request.use(config => {
     // 给请求头加上Authorization,authJWT的字段,值为token
-    config.headers.Authorization = window.localStorage.getItem('token')
-    config.headers.authJWT = window.localStorage.getItem('token')
+    // config.headers.Authorization = window.localStorage.getItem('token')
+    // config.headers.authJWT = window.localStorage.getItem('token')
+    config.headers.token = window.localStorage.getItem('token')
     return config
 })
 // 响应拦截
 service.interceptors.response.use(response => {
-    // 请求成功
-    // 1. 根据自己项目需求定制自己的拦截
-    // 2. 然后返回数据
+    // 未设置状态码则默认成功状态
+    const code = response.data.code || 200;
+    if(code===401){
+       
+    }
     return response;
 }, error => {
     // 请求失败

@@ -1,6 +1,7 @@
 import { Icon, Menu } from 'antd';
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
+import { getMenu } from '../../api/menu';
 //引入
 import logo from '../../assets/images/logo.png';
 import menuList from '../../config/menuConfig.jsx';
@@ -13,6 +14,15 @@ const { SubMenu } = Menu;
  * 左侧导航
  */
 class LeftNav extends Component {
+
+    getMenuList(){
+        // let params = {
+
+        // }
+        getMenu().then(res=>{
+            console.log(res)
+        })
+    }
 
     /**
      * 根据指定的menu数据去生成路由
@@ -89,7 +99,7 @@ class LeftNav extends Component {
 
     //第一次runder后执行，执行一次，一般执行异步请求
     componentDidMount(){
-        
+        this.getMenuList()
     }
 
 
